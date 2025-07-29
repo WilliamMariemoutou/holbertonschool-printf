@@ -1,2 +1,1 @@
-# holbertonschool-printf
-First project
+readme
