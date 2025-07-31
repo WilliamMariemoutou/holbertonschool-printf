@@ -19,7 +19,9 @@ int _printf(const char *format, ...)
 
     /* Optional: check if format is empty string*/
     if (format[0] == '\0')
+	{
         return (0);
+	}
 
 	va_start(args, format); /*initialize the argument list*/
 
