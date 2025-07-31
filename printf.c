@@ -14,8 +14,13 @@ int _printf(const char *format, ...)
 	int count = 0; /* to couunt number of characters printed*/
 	int j = 0;
 
-	if (format[0] == '\0')
-		return(0);
+	 if (format == NULL)  // Check if format pointer is NULL, return error
+        return (-1);
+
+    // Optional: check if format is empty string
+    if (format[0] == '\0')
+        return (0);
+
 	va_start(args, format); /*initialize the argument list*/
 
 	while (format[i] != '\0') /* loop through the format string*/
