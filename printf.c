@@ -13,6 +13,9 @@ int _printf(const char *format, ...)
 	int i = 0; /* index for traversing format string*/
 	int count = 0; /* to couunt number of characters printed*/
 	int j = 0;
+
+	if (format[0] == '\0')
+		return(0);
 	va_start(args, format); /*initialize the argument list*/
 
 	while (format[i] != '\0') /* loop through the format string*/
@@ -54,5 +57,11 @@ int _printf(const char *format, ...)
     va_end(args);
     return (count);
 }
-		
+int main(void) {
+    _printf("Hello World\n");
+    _printf("%c\n", 'A');
+    _printf("%s\n", "test");
+    _printf("%%\n");
+    return 0;
+}		
 
