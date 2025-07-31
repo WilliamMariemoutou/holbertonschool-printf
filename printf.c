@@ -14,10 +14,10 @@ int _printf(const char *format, ...)
 	int count = 0; /* to couunt number of characters printed*/
 	int j = 0;
 
-	 if (format == NULL)  // Check if format pointer is NULL, return error
+	 if (format == NULL)  /* Check if format pointer is NULL, return error*/
         return (-1);
 
-    // Optional: check if format is empty string
+    /* Optional: check if format is empty string*/
     if (format[0] == '\0')
         return (0);
 
