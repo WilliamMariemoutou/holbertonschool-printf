@@ -14,8 +14,8 @@ int _printf(const char *format, ...)
 	int count = 0; /* to couunt number of characters printed*/
 	int j = 0;
 
-	if (format[0] == NULL)
-		return(-1);
+	if (format[0] == '\0')
+		return(0);
 	va_start(args, format); /*initialize the argument list*/
 
 	while (format[i] != '\0') /* loop through the format string*/
