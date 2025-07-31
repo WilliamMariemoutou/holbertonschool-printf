@@ -52,7 +52,7 @@ int _printf(const char *format, ...)
 
             /* If string is NULL, print "NO STRING" instead */
             if (str == NULL)
-                str = "NO STRING";
+                str = "(null)";
 
             /* Write each character of the string */
             for (j = 0; str[j] != '\0'; j++)
