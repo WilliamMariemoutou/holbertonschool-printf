@@ -1,68 +1,58 @@
-#include "main.h"       /* Include custom header file */
-#include <stdarg.h>     /* For handling variable argument list macros */
-#include <unistd.h>     /* For write function to output to stdout */
+#include "main.h"
+#include <stdarg.h> /*Access to variadic functions*/
+#include <unistd.h>/*Gives us write()*/
 
 /**
- * _printf - Produces output according to a format
- * @format: The format string (contains text and format specifiers)
- * Return: Number of characters printed (excluding null byte)
+ *_printf - Produces output according to a format
+ *@format: The format string
+ *Return: Number of characters printed
  */
 int _printf(const char *format, ...)
 {
-    va_list args;       /* Declare a variable to hold the argument list */
-    int i = 0;          /* Index to traverse the format string */
-    int count = 0;      /* Count of characters printed */
+	va_list args; /*declare a list to hold arguments*/
+	int i = 0; /* index for traversing format string*/
+	int count = 0; /* to couunt number of characters printed*/
 	int j = 0;
+	va_start(args, format); /*initialize the argument list*/
 
-    if (format == NULL) /* Check for NULL format string */
-        return (-1);    /* Return -1 to indicate error */
-
-    va_start(args, format); /* Initialize args to retrieve arguments after 'format' */
-
-    while (format[i] != '\0') /* Loop until end of format string */
-    {
-        /* Check for %c specifier (character) */
-        if (format[i] == '%' && format[i + 1] == 'c')
-        {
-            char ch = va_arg(args, int);   /* Get the next argument as an int (char is promoted to int) */
-            write(1, &ch, 1);              /* Write the character to stdout */
-            count++;                       /* Increment count for one character printed */
-            i += 2;                        /* Skip both '%' and 'c' */
-        }
-
-        /* Check for %s specifier (string) */
+	while (format[i] != '\0') /* loop through the format string*/
+	{
+		/* Check if we found a format specifier %c*/
+		if (format[i] == '%' && format[i + 1] == 'c')
+		{
+			char ch = va_arg(args, int); /*get the next argument as char*/
+			write(1, &ch, 1); /*print that character*/
+			count++; /*increment count*/
+			i += 2; /*skip '%' and 'c'*/
+		}
         else if (format[i] == '%' && format[i + 1] == 's')
         {
-            char *str = va_arg(args, char *); /* Get next argument as a string (char pointer) */
-            if (str == NULL)                  /* If the string is NULL */
-                str = "(null)";               /* Replace with default string "(null)" */
-
-            /* Loop through each character in the string */
-            for (j = 0; str[j] != '\0'; j++)
+            char *str = va_arg(args, char *);
+            if (str == NULL)
+                str = "(null)";
+            for (int j = 0; str[j] != '\0'; j++)
             {
-                write(1, &str[j], 1); /* Write each character to stdout */
-                count++;              /* Increment count for each character printed */
+                write(1, &str[j], 1);
+                count++;
             }
-            i += 2; /* Skip both '%' and 's' */
+            i += 2;
         }
-
-        /* Check for %% specifier (literal percent sign) */
         else if (format[i] == '%' && format[i + 1] == '%')
         {
-            write(1, "%", 1); /* Write a literal '%' to stdout */
-            count++;          /* Increment count */
-            i += 2;           /* Skip both '%' characters */
+            write(1, "%", 1);
+            count++;
+            i += 2;
         }
-
-        /* Regular character, just print it */
         else
         {
-            write(1, &format[i], 1); /* Write current character to stdout */
-            count++;                 /* Increment count */
-            i++;                     /* Move to next character */
+            write(1, &format[i], 1);
+            count++;
+            i++;
         }
     }
 
-    va_end(args); /* Clean up the variable argument list */
-    return (count); /* Return total number of characters printed */
+    va_end(args);
+    return (count);
 }
+		
+
