@@ -62,13 +62,4 @@ int _printf(const char *format, ...)
     }
 
     va_end(args);
-    return (count);
-}
-int main(void) {
-    _printf("Hello World\n");
-    _printf("%c\n", 'A');
-    _printf("%s\n", "test");
-    _printf("%%\n");
-    return 0;
-}		
-
+    return (count);		
