@@ -66,11 +66,17 @@ int _printf(const char *format, ...)
         }
         /* Check for %% specifier (print a single percent sign) */
         else if (format[i] == '%' && format[i + 1] == '%')
+		
         {
             write(1, "%", 1);
             count++;
             i += 2;
         }
+		else if (format[i] == '%' && format[i + 1] == '\0')
+		{
+			va_end(args);
+			return (-1);
+		}
         /* Otherwise, just print the current character */
         else
         {
