@@ -1,102 +1,125 @@
-#include "main.h"              /* Include custom header for function declaration */
-#include <stdarg.h>            /* For va_list, va_start, va_arg, va_end */
-#include <unistd.h>            /* For the write system call */
+#include <stdarg.h>  /* For handling variable argument lists */
+#include <unistd.h>  /* For write function */
+#include <stdlib.h>  /* For malloc and free */
 
 /**
- * _printf - Custom printf function that mimics printf
- * @format: The format string to parse and print
+ * print_char - Prints a single character to stdout
+ * @c: The character to print
  *
- * Return: Total number of characters printed
+ * Return: Number of characters printed (1)
+ */
+int print_char(char c)
+{
+    return write(1, &c, 1);  /* Write one character to stdout */
+}
+
+/**
+ * print_string - Prints a string to stdout
+ * @str: The string to print
+ *
+ * Return: Number of characters printed
+ */
+int print_string(char *str)
+{
+    int count = 0;  /* Counter for printed characters */
+
+    if (!str)  /* If the string is NULL */
+        str = "(null)";  /* Print default null representation */
+
+    while (*str)  /* Iterate through each character in string */
+    {
+        write(1, str++, 1);  /* Print character and move to next */
+        count++;  /* Increment character count */
+    }
+
+    return count;  /* Return total printed characters */
+}
+
+/**
+ * print_number - Prints an integer to stdout
+ * @n: The number to print
+ *
+ * Return: Number of characters printed
+ */
+int print_number(int n)
+{
+    char buffer[11];  /* Buffer to hold digits (max for int + sign) */
+    int i = 10;  /* Start from end of buffer */
+    int count = 0;  /* Character count */
+    unsigned int num;  /* Unsigned version of number */
+
+    buffer[10] = '\0';  /* Null-terminate string */
+
+    if (n == 0)
+        return write(1, "0", 1);  /* Handle 0 directly */
+
+    if (n < 0)
+    {
+        count += write(1, "-", 1);  /* Print minus sign */
+        num = -n;  /* Convert to positive */
+    }
+    else
+    {
+        num = n;  /* Use number as is */
+    }
+
+    while (num > 0)
+    {
+        buffer[--i] = (num % 10) + '0';  /* Store digit character */
+        num /= 10;  /* Move to next digit */
+    }
+
+    count += write(1, &buffer[i], 10 - i);  /* Print digits */
+
+    return count;  /* Return total printed characters */
+}
+
+/**
+ * _printf - Custom printf function supporting %c, %s, %%, %d and %i
+ * @format: The format string
+ *
+ * Return: Number of characters printed
  */
 int _printf(const char *format, ...)
 {
-	va_list args;              /* Declare variable to access variadic arguments */
-	int i = 0;                 /* Index to iterate through the format string */
-	int j;                     /* Index used for printing strings */
-	int count = 0;             /* Counter to keep track of characters printed */
+    int i = 0, count = 0;  /* Loop index and total char count */
+    va_list args;  /* Argument list */
 
-	if (format == NULL || format[0] == '\0')  /* Check for NULL or empty format */
-		return (-1);            /* Return error if format is invalid */
+    if (!format)  /* If format string is NULL */
+        return -1;  /* Return error */
 
-	va_start(args, format);    /* Initialize args to start reading after 'format' */
+    va_start(args, format);  /* Initialize argument list */
 
-	while (format[i] != '\0')  /* Loop through each character in format string */
-	{
-		if (format[i] == '%' && format[i + 1] == 'c')  /* Handle %c (char) */
-		{
-			char ch = va_arg(args, int);  /* Get character argument */
-			write(1, &ch, 1);              /* Print character */
-			count++;                       /* Increase count */
-			i += 2;                        /* Skip % and format character */
-		}
-		else if (format[i] == '%' && format[i + 1] == 's')  /* Handle %s (string) */
-		{
-			char *str = va_arg(args, char *);  /* Get string argument */
+    while (format[i])  /* Loop through format string */
+    {
+        if (format[i] != '%')  /* Normal character */
+        {
+            count += write(1, &format[i], 1);  /* Print it */
+        }
+        else  /* Handle format specifier */
+        {
+            i++;  /* Move to specifier character */
+            if (!format[i])
+                break;  /* End of string, break loop */
+            if (format[i] == 'c')  /* Character */
+                count += print_char(va_arg(args, int));
+            else if (format[i] == 's')  /* String */
+                count += print_string(va_arg(args, char *));
+            else if (format[i] == 'd' || format[i] == 'i')  /* Integer */
+                count += print_number(va_arg(args, int));
+            else if (format[i] == '%')  /* Percent sign */
+                count += write(1, "%", 1);
+            else
+            {
+                count += write(1, "%", 1);  /* Print invalid format start */
+                count += write(1, &format[i], 1);  /* Then the unknown char */
+            }
+        }
+        i++;  /* Move to next character */
+    }
 
-			if (str == NULL)                   /* If string is NULL */
-				str = "(null)";               /* Print "(null)" instead */
+    va_end(args);  /* Cleanup argument list */
 
-			for (j = 0; str[j] != '\0'; j++)   /* Loop through string */
-			{
-				write(1, &str[j], 1);         /* Print each character */
-				count++;                      /* Count each character */
-			}
-			i += 2;                            /* Skip % and format character */
-		}
-		else if (format[i] == '%' &&
-			(format[i + 1] == 'd' || format[i + 1] == 'i'))  /* Handle %d or %i */
-		{
-			int n = va_arg(args, int);        /* Get integer argument */
-			char buf[20];                     /* Buffer to hold digits */
-			int idx = 0;                      /* Index for buf array */
-
-			if (n < 0)                        /* Handle negative numbers */
-			{
-				write(1, "-", 1);             /* Print negative sign */
-				count++;                      /* Count the '-' */
-				n = -n;                       /* Make number positive */
-			}
-
-			if (n == 0)                       /* Special case: 0 */
-			{
-				write(1, "0", 1);             /* Print 0 */
-				count++;                      /* Count the digit */
-			}
-			else
-			{
-				while (n > 0)                 /* Convert number to digits */
-				{
-					buf[idx++] = (n % 10) + '0';  /* Get last digit and convert to char */
-					n /= 10;                      /* Remove last digit */
-				}
-
-				while (idx--)                /* Print digits in correct order */
-				{
-					write(1, &buf[idx], 1);  /* Write one digit at a time */
-					count++;                 /* Count each digit printed */
-				}
-			}
-			i += 2;                          /* Skip % and format character */
-		}
-		else if (format[i] == '%' && format[i + 1] == '%')  /* Handle %% */
-		{
-			write(1, "%", 1);                /* Print literal % */
-			count++;                         /* Count it */
-			i += 2;                          /* Skip both % symbols */
-		}
-		else if (format[i] == '%' && format[i + 1] == '\0')  /* % at end = invalid */
-		{
-			va_end(args);                   /* Clean up va_list */
-			return (-1);                    /* Return error */
-		}
-		else                                /* Normal character (not a format specifier) */
-		{
-			write(1, &format[i], 1);        /* Print character as-is */
-			count++;                        /* Count the character */
-			i++;                            /* Move to next character */
-		}
-	}
-
-	va_end(args);                           /* Clean up va_list */
-	return (count);                         /* Return total number printed */
+    return count;  /* Return total printed characters */
 }
+
