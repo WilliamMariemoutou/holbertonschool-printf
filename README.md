@@ -1,4 +1,4 @@
-NAME
+NAME;
 _printf – custom function that prints formatted output, similar to printf
 
 SYNOPSIS
